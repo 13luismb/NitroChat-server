@@ -1,10 +1,12 @@
 const express = require('express');
 //let session = require('express-session');
+const fs = require('fs');
 const app = express();
 const jwt = require('express-jwt');
 const config = require('./helpers/config');
 let passport = require('passport');
 let strategies = require('./helpers/strategies');
+const fileUpload = require('express-fileupload');
 let auth = require('./middlewares/isAuth');
 
 
@@ -26,7 +28,11 @@ app.use('/', require('./controllers'));
 app.get('/', function(req, res) {
     res.redirect('views/index.html');
 });
-
+const models_path = __dirname+'/helpers';
+fs.readdirSync(models_path).forEach(file => {
+  require(models_path+'/'+file);
+});
+app.use(fileUpload());
 app.use(auth.isValidToken);
 passport.use(strategies.localStrategy);
 passport.use(strategies.jwtStrategy);

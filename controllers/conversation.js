@@ -6,6 +6,10 @@ let router = express.Router();
 const Conversation = require('./../helpers/conversation');
 const config = require('./../helpers/config');
 const server = require('./../index.js');
+const express = require('express');
+let router = express.Router();
+const auth = require('./../middlewares/jwtAuth');
+const Chat = require('./../helpers/conversation');
 
 
 
@@ -34,3 +38,15 @@ const server = require('./../index.js');
 module.exports = router;
 
 
+
+router.get('/chats', auth, async (req,res)=>{
+    try{
+        const resp = await Chat.getListChats(req);
+        console.log(resp);
+        res.status(resp.status).send(resp);
+    }catch(err){
+        res.send(500).send(err);
+    }
+});
+
+module.exports = router;

@@ -10,5 +10,7 @@ router.use(function(req, res, next) {
 router.use(require('./session'));
 router.use(require('./register'));
 router.use(require('./conversation'));
+router.use(require('./message'));
+
 
 module.exports = router;
