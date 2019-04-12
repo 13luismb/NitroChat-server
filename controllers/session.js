@@ -42,7 +42,7 @@ router.get('/logout', function(req, res) {
 });
 
 router.put('/updateProfile', async (req,res)=>{
-    const resp = await User.updateProfile(req, req.body.username, req.body.email, req.body.name, req.body.phone);
+    const resp = await User.updateProfile(req, req.body.username, req.body.name, req.body.email, req.body.phone);
     if (resp.status === 200){
         const user = req.body;
         req.logIn(user, { session: false }, function(err) {
@@ -57,7 +57,7 @@ router.put('/updateProfile', async (req,res)=>{
                 status: 200,
                 message: 'ok',
                 token: jsonWebToken,
-                user: user
+                user: req.user
             });
     });
     }

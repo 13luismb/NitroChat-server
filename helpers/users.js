@@ -54,7 +54,7 @@ module.exports.registerUser = (phone, username, password, name, email) => {
 
 module.exports.updateProfile = async (req, username, email, name, phone) => {
     try{
-        await db.none(sql.updateUser, [username, email, name, phone, req.user.users_id]);
+        await db.none(sql.updateUser, [username, name, email, phone, req.user.users_id]);
         return ({
             status: 200,
             message:'lo lograste'
