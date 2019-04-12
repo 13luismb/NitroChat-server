@@ -43,8 +43,9 @@ router.get('/logout', function(req, res) {
 });
 
 router.put('/updateProfile', async (req,res)=>{
-    const resp = await User.updateProfile(req, req.body.username, req.body.name, req.body.email, req.body.phone);
+    const resp = await User.updateProfile(req, req.body.username, req.body.email, req.body.name , req.body.phone);
     if (resp.status === 200){
+        const preUser = {...req.user};
         const user = req.body;
         req.logIn(user, { session: false }, function(err) {
             if (err) {
@@ -58,7 +59,14 @@ router.put('/updateProfile', async (req,res)=>{
                 status: 200,
                 message: 'ok',
                 token: jsonWebToken,
-                user: req.user
+                user: {
+                      users_id: preUser.users_id,
+                      users_phone: req.user.phone
+                    , users_username: req.user.username
+                    , users_name: req.user.name
+                    , users_email: req.user.email
+                    , user_picture_url: preUser.user_picture_url
+                    , users_creation_time: preUser.users_creation_time}
             });
     });
     }

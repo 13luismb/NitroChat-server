@@ -57,7 +57,8 @@ module.exports.updateProfile = async (req, username, email, name, phone) => {
         await db.none(sql.updateUser, [username, name, email, phone, req.user.users_id]);
         return ({
             status: 200,
-            message:'lo lograste'
+            message:'lo lograste',
+            user: req.user
         });
     }catch(e){
         console.log(e);
