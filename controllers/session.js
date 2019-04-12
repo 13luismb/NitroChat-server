@@ -4,6 +4,7 @@ const auth = require('./../middlewares/jwtAuth');
 const jwt = require('jsonwebtoken');
 let router = express.Router();
 const User = require('./../helpers/users');
+const upload = require('./../helpers/uploads');
 const config = require('./../helpers/config');
 
 router.post('/login', function(req, res, next) {
@@ -63,9 +64,38 @@ router.put('/updateProfile', async (req,res)=>{
     }
 });
 
-router.post('/updatePicture', async (req,res) => {
-    await User.setPhoto(req,res);
+router.post('/updatePicture', auth, upload.single('image'), async (req,res) => {
+    try{
+        const resp = await User.updateProfilePicture(req);
+        if(resp.status ===200){
+            const user = req.user;
+            req.logIn(user, { session: false }, function(err) {
+                if (err) {
+                    return res.status(500).send({
+                        err: 'Could not log in user'
+                    });
+                }
+
+                let jsonWebToken = jwt.sign(user, config.secret);
+            res.status(resp.status).send({...resp, token: jsonWebToken});
+            });
+        } else{
+            res.status(401).send({});
+        }
+    }catch(e){
+        console.log(e);
+        res.send(e);
+    }
 });
+
+router.get('/search/:name', auth, async (req, res) => {
+    try{
+        const resp = await User.searchUser(req.params.name);
+        res.status(resp.status).send(resp);
+    }catch(e){
+        res.send(e);
+    }
+})
 
 
 

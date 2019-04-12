@@ -68,6 +68,27 @@ module.exports.updateProfile = async (req, username, email, name, phone) => {
     }
 };
 
+
+module.exports.updateProfilePicture = async (req) => {
+    try{
+    const user = req.user;
+    const image = `./views/uploads/${user.users_id}/${req.file.filename}`;
+    const value = req.file.path;
+    user.user_picture_url = image;
+    await db.none(sql.updatePicture, [image, user.users_id]);
+    return ({
+        status:200,
+        user: req.user
+    });
+    }catch(e){
+        return({
+            status: 500,
+            error: e
+        });
+    }
+
+}
+
 module.exports.setPhoto = async (req, res) => {
     const user = req.user;
     console.log(req);
@@ -95,23 +116,19 @@ module.exports.setPhoto = async (req, res) => {
     }
 };
 
-module.exports.uploadAndSave = function (images, callback) {
-        // const imager = new Imager(imagerConfig, "S3");
-        const self = this;
-        if (!images || !images.length) {
-            return this.save(callback);
+module.exports.searchUser = async (user) => {
+    try{
+        const data = await db.any(sql.searchUser, [`%${user}%`]);
+        console.log(data);
+        return ({
+            status: 200,
+            data: data
+        });
+    }catch(e){
+        console.log(e);
+        return {
+            error: e,
+            status: 500
         }
-        imager.upload(
-            images,
-            (err, cdnUri, files) => {
-                if (err) {
-                    return callback(err);
-                }
-                if (files.length) {
-                    self.image = {cdnUri: cdnUri, files: files};
-                }
-                self.save(callback);
-            },
-            "article"
-        );
     }
+};
