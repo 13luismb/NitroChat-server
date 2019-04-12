@@ -43,7 +43,24 @@ router.get('/logout', function(req, res) {
 
 router.put('/updateProfile', async (req,res)=>{
     const resp = await User.updateProfile(req, req.body.username, req.body.email, req.body.name, req.body.phone);
-    res.status(resp.status).send(resp);
+    if (resp.status === 200){
+        const user = req.body;
+        req.logIn(user, { session: false }, function(err) {
+            if (err) {
+                return res.status(500).send({
+                    err: 'Could not log in user'
+                });
+            }
+
+            let jsonWebToken = jwt.sign(user, config.secret);
+            res.status(200).send({
+                status: 200,
+                message: 'ok',
+                token: jsonWebToken,
+                user: user
+            });
+    });
+    }
 });
 
 
