@@ -21,6 +21,7 @@ app.use('/', require('./controllers'));
 app.get('/', function(req, res) {
     res.redirect('views/index.html');
 });
+
 app.use(auth.isValidToken);
 passport.use(strategies.localStrategy);
 passport.use(strategies.jwtStrategy);
