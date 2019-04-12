@@ -7,6 +7,11 @@ let passport = require('passport');
 let strategies = require('./helpers/strategies');
 let auth = require('./middlewares/isAuth');
 
+
+
+const socket = require('socket.io');
+const io = socket(server);
+
 app.use('/views', express.static(__dirname + '/public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -34,3 +39,5 @@ passport.deserializeUser(function(user, done) {
 app.listen(config.port, function() {
     console.log('Example app listening on port 3001!');
 });
+
+module.exports = io;
