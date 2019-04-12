@@ -63,6 +63,10 @@ router.put('/updateProfile', async (req,res)=>{
     }
 });
 
+router.post('/updatePicture', async (req,res) => {
+    await User.setPhoto(req,res);
+});
+
 
 
 module.exports = router;
