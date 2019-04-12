@@ -4,6 +4,7 @@ const auth = require('./../middlewares/jwtAuth');
 const jwt = require('jsonwebtoken');
 let router = express.Router();
 const User = require('./../helpers/users');
+const upload = require('./../helpers/uploads');
 const config = require('./../helpers/config');
 
 router.post('/login', function(req, res, next) {
@@ -63,9 +64,25 @@ router.put('/updateProfile', async (req,res)=>{
     }
 });
 
-router.post('/updatePicture', async (req,res) => {
-    await User.setPhoto(req,res);
+router.post('/updatePicture', auth, upload.single('image'), async (req,res) => {
+    try{
+        console.log(req.file);
+        const resp = await User.updateProfilePicture(req);
+        res.status(resp.status).send(resp);
+    }catch(e){
+        console.log(e);
+        res.send(e);
+    }
 });
+
+router.get('/search/:name', auth, async (req, res) => {
+    try{
+        const resp = await User.searchUser(req.params.name);
+        res.status(resp.status).send(resp);
+    }catch(e){
+        res.send(e);
+    }
+})
 
 
 
