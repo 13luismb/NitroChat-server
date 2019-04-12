@@ -17,7 +17,8 @@ let queries = {
         createMessage: new PS('create-message','INSERT INTO MESSAGE (users_id, conversations_id, message_attachment, message_body, created_at) VALUES ($1, $2, $3, $4, $5) RETURNING *'),
         getListMessages: new PS('get-messages','SELECT me.*,us.users_id, us.users_username, us.users_name FROM MESSAGE me INNER JOIN USERS us ON us.users_id = me.users_id WHERE me.conversations_id = $1'),
         deleteMessage: new PS('delete-message','DELETE FROM MESSAGE WHERE message_id = $1 AND conversations_id = $2'),
-        editMessage: new PS('edit-message','UPDATE MESSAGE SET message_body = $1 WHERE message_id=$2')
+        editMessage: new PS('edit-message','UPDATE MESSAGE SET message_body = $1 WHERE message_id=$2'),
+        searchUser: new PS('search-user', 'SELECT * FROM USERS WHERE users_name LIKE $1')
 
 }
 
