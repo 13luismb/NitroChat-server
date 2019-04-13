@@ -77,6 +77,7 @@ router.post('/updatePicture', auth, upload.single('image'), async (req,res) => {
         const resp = await User.updateProfilePicture(req);
         if(resp.status ===200){
             const user = req.user;
+            //console.log('este es el user', req.user);
             req.logIn(user, { session: false }, function(err) {
                 if (err) {
                     return res.status(500).send({
@@ -114,7 +115,6 @@ router.get('/search/:name', auth, async (req, res) => {
         res.send(e);
     }
 });
-
 
 
 module.exports = router;
