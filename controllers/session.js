@@ -96,6 +96,16 @@ router.post('/updatePicture', auth, upload.single('image'), async (req,res) => {
     }
 });
 
+router.get('/searchAll', auth, async (req, res) => {
+    try{
+        const resp = await User.searchUser(null);
+        res.status(resp.status).send(resp);
+    }catch(e){
+        res.send(e);
+    }
+});
+
+
 router.get('/search/:name', auth, async (req, res) => {
     try{
         const resp = await User.searchUser(req.params.name);
@@ -103,7 +113,7 @@ router.get('/search/:name', auth, async (req, res) => {
     }catch(e){
         res.send(e);
     }
-})
+});
 
 
 
