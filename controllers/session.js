@@ -97,10 +97,33 @@ router.post('/updatePicture', auth, upload.single('image'), async (req,res) => {
     }
 });
 
-router.get('/searchAll', auth, async (req, res) => {
+router.post('/searchAll', auth, async (req, res) => {
     try{
+        const contacts = [...req.body.data];
+
         const resp = await User.searchUser(null);
-        res.status(resp.status).send(resp);
+        let userList = { users: [], notUsers: []};
+        let Available;
+        for(let contact of contacts){
+            let newUser = { displayName: contact._objectInstance.displayName,
+                phoneNumber: contact._objectInstance.phoneNumbers[0].value};
+            for(let el of resp.data){
+               if(newUser.phoneNumber === el.users_phone){
+                   newUser.id = el.users_id;
+                   newUser.picture_url =el.user_picture_url;
+                   Available = true
+               }else {
+                   Available = false
+               }
+            }
+            if(Available){
+                userList.users.push(newUser);
+            }else{
+                userList.notUsers.push(newUser);
+            }
+        }
+        console.log(userList);
+        res.status(resp.status).send(userList);
     }catch(e){
         res.send(e);
     }
