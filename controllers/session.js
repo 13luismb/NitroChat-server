@@ -48,11 +48,11 @@ router.put('/updateProfile', async (req,res)=>{
         const preUser = {...req.user};
         const user = req.body;
         req.logIn(user, { session: false }, function(err) {
-            if (err) {
-                return res.status(500).send({
-                    err: 'Could not log in user'
-                });
-            }
+                if (err) {
+                    return res.status(500).send({
+                        err: 'Could not log in user'
+                    });
+                }
 
             let jsonWebToken = jwt.sign(user, config.secret);
             res.status(200).send({
