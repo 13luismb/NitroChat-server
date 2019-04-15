@@ -43,7 +43,7 @@ router.get('/logout', function(req, res) {
 });
 
 router.put('/updateProfile', async (req,res)=>{
-    const resp = await User.updateProfile(req, req.body.username, req.body.name, req.body.email, req.body.phone);
+    const resp = await User.updateProfile(req, req.body.username, req.body.email, req.body.name , req.body.phone);
     if (resp.status === 200){
         let user = req.user;
         let body = req.body;
@@ -64,7 +64,14 @@ router.put('/updateProfile', async (req,res)=>{
                 status: 200,
                 message: 'ok',
                 token: jsonWebToken,
-                user: req.user
+                user: {
+                      users_id: preUser.users_id,
+                      users_phone: req.user.phone
+                    , users_username: req.user.username
+                    , users_name: req.user.name
+                    , users_email: req.user.email
+                    , user_picture_url: preUser.user_picture_url
+                    , users_creation_time: preUser.users_creation_time}
             });
     });
     }
@@ -75,6 +82,7 @@ router.post('/updatePicture', auth, upload.single('image'), async (req,res) => {
         const resp = await User.updateProfilePicture(req);
         if(resp.status ===200){
             const user = req.user;
+            //console.log('este es el user', req.user);
             req.logIn(user, { session: false }, function(err) {
                 if (err) {
                     return res.status(500).send({
@@ -94,6 +102,39 @@ router.post('/updatePicture', auth, upload.single('image'), async (req,res) => {
     }
 });
 
+router.post('/searchAll', auth, async (req, res) => {
+    try{
+        const contacts = [...req.body.data];
+
+        const resp = await User.searchUser(null);
+        let userList = { users: [], notUsers: []};
+        let Available;
+        for(let contact of contacts){
+            let newUser = { displayName: contact._objectInstance.displayName,
+                phoneNumber: contact._objectInstance.phoneNumbers[0].value};
+            for(let el of resp.data){
+               if(newUser.phoneNumber === el.users_phone){
+                   newUser.id = el.users_id;
+                   newUser.picture_url =el.user_picture_url;
+                   Available = true
+               }else {
+                   Available = false
+               }
+            }
+            if(Available){
+                userList.users.push(newUser);
+            }else{
+                userList.notUsers.push(newUser);
+            }
+        }
+        console.log(userList);
+        res.status(resp.status).send(userList);
+    }catch(e){
+        res.send(e);
+    }
+});
+
+
 router.get('/search/:name', auth, async (req, res) => {
     try{
         const resp = await User.searchUser(req.params.name);
@@ -101,8 +142,7 @@ router.get('/search/:name', auth, async (req, res) => {
     }catch(e){
         res.send(e);
     }
-})
-
+});
 
 
 module.exports = router;
