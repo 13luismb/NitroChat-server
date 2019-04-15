@@ -57,8 +57,7 @@ module.exports.updateProfile = async (req, username, name, email, phone) => {
         await db.none(sql.updateUser, [username, name, email, phone, req.user.users_id]);
         return ({
             status: 200,
-            message:'lo lograste',
-            user: req.user
+            message:'lo lograste'
         });
     }catch(e){
         console.log(e);
@@ -119,12 +118,8 @@ module.exports.setPhoto = async (req, res) => {
 
 module.exports.searchUser = async (user) => {
     try{
-        let data;
-        if(user){
-         data = await db.any(sql.searchUser, [`%${user}%`]);
-        } else{
-            data = await db.any(sql.searchUser, [`%%`]);
-        }
+        const data = await db.any(sql.searchUser, [`%${user}%`]);
+        console.log(data);
         return ({
             status: 200,
             data: data
