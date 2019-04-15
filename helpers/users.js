@@ -74,6 +74,8 @@ module.exports.updateProfilePicture = async (req) => {
     try{
     const user = req.user;
     const image = `./views/uploads/${user.users_id}/${req.file.filename}`;
+    console.log(image);
+    console.log(req.file);
     const value = req.file.path;
     user.user_picture_url = image;
     await db.none(sql.updatePicture, [image, user.users_id]);

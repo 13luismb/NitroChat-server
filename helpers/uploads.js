@@ -1,4 +1,5 @@
 const multer = require('multer');
+const bcrypt = require('bcryptjs');
 var fs = require('fs');
 
 let storage = multer.diskStorage({
@@ -12,7 +13,14 @@ let storage = multer.diskStorage({
 
     },
     filename: function(req, file, cb) {
-        cb(null, `${file.originalname}`)
+        let type;
+        switch(file.mimetype){
+            case 'image/jpeg': type = `.jpeg`; break;
+            case 'image/jpg': type = '.jpg'; break;
+            case 'image/png': type = '.png'; break;
+            case 'image/gif': type = '.gif'; break;
+        }
+        cb(null, `${new Date().getTime()}${type}`)
     }
 });
 
