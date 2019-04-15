@@ -66,9 +66,22 @@ router.put('/updateProfile', async (req,res)=>{
 
 router.post('/updatePicture', auth, upload.single('image'), async (req,res) => {
     try{
-        console.log(req.file);
         const resp = await User.updateProfilePicture(req);
-        res.status(resp.status).send(resp);
+        if(resp.status ===200){
+            const user = req.user;
+            req.logIn(user, { session: false }, function(err) {
+                if (err) {
+                    return res.status(500).send({
+                        err: 'Could not log in user'
+                    });
+                }
+
+                let jsonWebToken = jwt.sign(user, config.secret);
+            res.status(resp.status).send({...resp, token: jsonWebToken});
+            });
+        } else{
+            res.status(401).send({});
+        }
     }catch(e){
         console.log(e);
         res.send(e);
