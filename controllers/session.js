@@ -43,10 +43,12 @@ router.get('/logout', function(req, res) {
 });
 
 router.put('/updateProfile', async (req,res)=>{
-    const resp = await User.updateProfile(req, req.body.username, req.body.email, req.body.name , req.body.phone);
+    const resp = await User.updateProfile(req, req.body.username, req.body.name, req.body.email, req.body.phone);
     if (resp.status === 200){
         let user = req.user;
         let body = req.body;
+       /* const preUser = {...req.user};
+        const user = req.body;*/
         user.users_username = body.username;
         user.users_name = body.name;
         user.users_email = body.email;
@@ -64,7 +66,7 @@ router.put('/updateProfile', async (req,res)=>{
                 status: 200,
                 message: 'ok',
                 token: jsonWebToken,
-                user: {
+                user: user /*{
                       users_id: preUser.users_id,
                       users_phone: req.user.phone
                     , users_username: req.user.username
@@ -72,7 +74,7 @@ router.put('/updateProfile', async (req,res)=>{
                     , users_email: req.user.email
                     , user_picture_url: preUser.user_picture_url
                     , users_creation_time: preUser.users_creation_time}
-            });
+            */});
     });
     }
 });
