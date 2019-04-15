@@ -52,7 +52,7 @@ module.exports.registerUser = (phone, username, password, name, email) => {
     });
 };
 
-module.exports.updateProfile = async (req, username, email, name, phone) => {
+module.exports.updateProfile = async (req, username, name, email, phone) => {
     try{
         await db.none(sql.updateUser, [username, name, email, phone, req.user.users_id]);
         return ({

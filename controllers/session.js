@@ -45,14 +45,20 @@ router.get('/logout', function(req, res) {
 router.put('/updateProfile', async (req,res)=>{
     const resp = await User.updateProfile(req, req.body.username, req.body.name, req.body.email, req.body.phone);
     if (resp.status === 200){
-        const user = req.body;
+        let user = req.user;
+        let body = req.body;
+        user.users_username = body.username;
+        user.users_name = body.name;
+        user.users_email = body.email;
+        user.users_phone = body.phone;
+        console.log(user);
         req.logIn(user, { session: false }, function(err) {
             if (err) {
+                console.log('toy aqui');
                 return res.status(500).send({
                     err: 'Could not log in user'
                 });
             }
-
             let jsonWebToken = jwt.sign(user, config.secret);
             res.status(200).send({
                 status: 200,
