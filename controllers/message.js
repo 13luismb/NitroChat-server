@@ -6,6 +6,18 @@ const upload = require('./../helpers/uploads');
 const Message = require('./../helpers/message');
 const io = require('./../helpers/socketconfig');
 
+io.sockets.on('connection', socket =>{
+    console.log(socket.rooms);
+    console.log('hola');
+    console.log(socket);
+    socket.on('culo', data => {
+        socket.join(socket.id);
+        io.sockets.to(socket.id).emit('aaa');
+        console.log(socket.rooms);
+        console.log('mamamelo');
+    });
+})
+
 
 router.get('/chats/:chatId', auth, async (req,res)=>{
     try{
@@ -16,6 +28,11 @@ router.get('/chats/:chatId', auth, async (req,res)=>{
         res.send(500).send(err);
     }
 });
+
+router.post('/culo', async (req,res)=>{
+    io.emit('culo', req.body);
+    res.status(200).send({message:'queslaverga'});
+})
 
 
 

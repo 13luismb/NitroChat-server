@@ -10,9 +10,9 @@ let strategies = require('./helpers/strategies');
 //const fileUpload = require('express-fileupload');
 let auth = require('./middlewares/isAuth');
 let http = require("http").Server(app);
-//const io = require('socket.io')(http);
 const server = require('./helpers/socketconfig');
 server.listen(config.socketPort);
+const io = require('socket.io')(http);
 
 app.use('/views', express.static(__dirname + '/public'));
 app.use(express.json());
@@ -20,7 +20,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(jwt({
     secret: config.secret
 }).unless({
-    path: ['/login', '/register', '/']
+    path: ['/login', '/register', '/', '/culo']
 }));
 app.use(passport.initialize());
 app.use(passport.session());
@@ -49,7 +49,7 @@ http.listen(config.port, function() {
 
 
 /*                  AQUI EMPIEZA SOCKET.IO                      */
-/*io.sockets.on('connection', socket => {
+io.sockets.on('connection', socket => {
     console.log('conectao');
         socket.on('hola', data => {
             console.log(data);
@@ -71,6 +71,6 @@ http.listen(config.port, function() {
             console.log('bye')
             let index = users[socket.room].findIndex(el => el === socket.nickname);
             users[socket.room].splice(index, 1);
-          });
+          });*/
 
-});*/
+});
