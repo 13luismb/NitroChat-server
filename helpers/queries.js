@@ -5,6 +5,7 @@ let queries = {
         getUser: new PS('get-user', "SELECT * FROM USERS WHERE users_username = $1"),
         getUserByPhone: new PS('get-user-by-phone', 'SELECT * FROM USERS WHERE users_phone = $1'),
         getUserByEmail: new PS('get-user-by-email', 'SELECT * FROM USERS WHERE users_email = $1'),
+        getLastMessage: new PS('last-message', 'SELECT * FROM MESSAGE WHERE conversations_id=$1 ORDER BY created_at DESC LIMIT 1'),
         updateUser: new PS('update-user', "UPDATE USERS SET users_username = $1, users_name = $2, users_email = $3, users_phone = $4 WHERE users_id = $5"),
         updatePicture: new PS('update-profile-pic', 'UPDATE USERS SET user_picture_url = $1 WHERE users_id = $2'),
         createStatus: new PS('create-status','INSERT INTO STATUS (STATUS_DESCRIPTION) VALUES ($1)'),

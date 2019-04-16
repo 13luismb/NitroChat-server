@@ -36,6 +36,7 @@ module.exports.getListChats = async (req) => {
         let c = await db.any(sql.getListConversation, [req.user.users_id]);
         await Promise.all(c.map(async el => {
             el.participants = await db.any(sql.getConversationParticipants, [el.conversations_id]);
+            el.last_message = await db.any(sql.getLastMessage, [el.conversations_id]);
         }));
         return ({
             status: 200,
