@@ -99,21 +99,28 @@ router.post('/updatePicture', auth, upload.single('image'), async (req,res) => {
 
 router.post('/searchAll', auth, async (req, res) => {
     try{
+        console.log('hi');
         const contacts = [...req.body.data];
-
         const resp = await User.searchUser(null);
         let userList = { users: [], notUsers: []};
         let Available;
         for(let contact of contacts){
+            Available = false;
+            let newNumber = contact._objectInstance.phoneNumbers[0].value
+                .replace(' ', '').replace('+', '').replace('(','').replace(')', '').replace('-','')
+            if(newNumber.startsWith('58')){
+                newNumber = newNumber.replace('58', '');
+            }
+            if(newNumber.startsWith('0')){
+                newNumber = newNumber.replace('0', '');
+            }
             let newUser = { displayName: contact._objectInstance.displayName,
-                phoneNumber: contact._objectInstance.phoneNumbers[0].value};
+                phoneNumber: newNumber};
             for(let el of resp.data){
                if(newUser.phoneNumber === el.users_phone){
+                   Available = true;
                    newUser.id = el.users_id;
                    newUser.picture_url =el.user_picture_url;
-                   Available = true
-               }else {
-                   Available = false
                }
             }
             if(Available){
@@ -130,10 +137,38 @@ router.post('/searchAll', auth, async (req, res) => {
 });
 
 
-router.get('/search/:name', auth, async (req, res) => {
+router.post('/search', auth, async (req, res) => {
     try{
-        const resp = await User.searchUser(req.params.name);
-        res.status(resp.status).send(resp);
+        const contacts = [...req.body.data];
+        const resp = await User.searchUser(req.body.name);
+        let userList = { users: [], notUsers: []};
+        let Available;
+        for(let contact of contacts){
+            Available = false;
+            let newNumber = contact._objectInstance.phoneNumbers[0].value
+                .replace(' ', '').replace('+', '').replace('(','').replace(')', '').replace('-','')
+            if(newNumber.startsWith('58')){
+                newNumber = newNumber.replace('58', '');
+            }
+            if(newNumber.startsWith('0')){
+                newNumber = newNumber.replace('0', '');
+            }
+            let newUser = { displayName: contact._objectInstance.displayName,
+                phoneNumber: newNumber};
+            for(let el of resp.data){
+                if(newUser.phoneNumber === el.users_phone){
+                    newUser.id = el.users_id;
+                    newUser.picture_url =el.user_picture_url;
+                    Available = true
+                }
+            }
+            if(Available){
+                userList.users.push(newUser);
+            }else{
+                userList.notUsers.push(newUser);
+            }
+        }
+        res.status(resp.status).send(userList);
     }catch(e){
         res.send(e);
     }
