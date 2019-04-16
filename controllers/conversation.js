@@ -19,7 +19,17 @@ const Chat = require('./../helpers/conversation');
             console.log(resp);
             res.status(resp.status).send(resp);
         }catch(err){
-            res.send(500).send(err);
+            res.status(500).send(err);
+        }
+    });
+
+    router.get('/chats/:userId', auth, async (req,res) => {
+        try{
+            const resp = await Chat.getDataFromChat(req, req.params.userId);
+            console.log(resp);
+            res.status(resp.status).send(resp);
+        }catch(e){
+            res.status(500).send(err);
         }
     });
 

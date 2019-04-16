@@ -6,12 +6,10 @@ const jwt = require('express-jwt');
 const config = require('./helpers/config');
 let passport = require('passport');
 let strategies = require('./helpers/strategies');
-const Conversation = require('./helpers/conversation');
-const Message = require('./helpers/message');
 //const fileUpload = require('express-fileupload');
 let auth = require('./middlewares/isAuth');
 let http = require("http").Server(app);
-let io = require("socket.io")(http);
+const io = require('socket.io')(http);
 
 app.use('/views', express.static(__dirname + '/public'));
 app.use(express.json());
@@ -46,16 +44,21 @@ http.listen(config.port, function() {
 });
 
 
+/*                  AQUI EMPIEZA SOCKET.IO                      */
+
 io.sockets.on('connection', socket => {
+    console.log('conectao');
+        socket.on('hola', data => {
+            console.log(data);
+        })
         socket.on('send-message', message => {
             
         });
-
         socket.on('enter-chat', async data => {
-            const resp = await Message.getListMessage(data.chatId);
+        //    const resp = await Message.getListMessage(data.chatId);
             socket.emit('get-messages', resp);
         });
-
+/*
         socket.on('initiate-chat', async data => {
             const resp = await Conversation.newConversation(data.token, data.type, data.converName, data.users);
             socket.emit('enter-chat', resp);
@@ -65,6 +68,6 @@ io.sockets.on('connection', socket => {
             console.log('bye')
             let index = users[socket.room].findIndex(el => el === socket.nickname);
             users[socket.room].splice(index, 1);
-          });
+          });*/
 
 });
