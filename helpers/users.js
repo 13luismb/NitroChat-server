@@ -29,6 +29,43 @@ module.exports.comparePassword = (candidatePassword, hash) => {
     });
 };
 
+module.exports.getUserByPhone = async (username, phone, email) =>{
+    try{
+        const User = await db.any(sql.getUser, [username]);
+        if (User.length>0){
+            return ({
+                exists: true,
+                reason: 'username already exists'
+            })
+        }
+
+        const Phone = await db.any(sql.getUserByPhone, [phone]);
+        if (Phone.length>0){
+            return ({
+                exists: true,
+                reason: 'phone already exists'
+            })
+        }
+
+        const Email = await db.any(sql.getUserByEmail, [email]);
+        if (Email.length>0){
+            return ({
+                exists: true,
+                reason: 'email already exists'
+            })
+        }
+        
+            return({
+                exists:false
+            });
+    }catch(e){
+        return ({
+            error: e,
+            status:500
+        })
+    }
+}
+
 module.exports.registerUser = (phone, username, password, name, email) => {
     return new Promise((res, rej) => {
         db.connect().then((obj) => {

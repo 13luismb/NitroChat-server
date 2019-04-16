@@ -3,6 +3,8 @@ let queries = {
         
         newUser: new PS('new-user', "INSERT INTO USERS (users_phone, users_username, users_name, users_email, users_password, user_picture_url, users_creation_time) VALUES ($1, $2, $3, $4, $5, $6, $7)"),
         getUser: new PS('get-user', "SELECT * FROM USERS WHERE users_username = $1"),
+        getUserByPhone: new PS('get-user-by-phone', 'SELECT * FROM USERS WHERE users_phone = $1'),
+        getUserByEmail: new PS('get-user-by-email', 'SELECT * FROM USERS WHERE users_email = $1'),
         updateUser: new PS('update-user', "UPDATE USERS SET users_username = $1, users_name = $2, users_email = $3, users_phone = $4 WHERE users_id = $5"),
         updatePicture: new PS('update-profile-pic', 'UPDATE USERS SET user_picture_url = $1 WHERE users_id = $2'),
         createStatus: new PS('create-status','INSERT INTO STATUS (STATUS_DESCRIPTION) VALUES ($1)'),

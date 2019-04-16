@@ -3,13 +3,16 @@ const express = require('express');
 const fs = require('fs');
 const app = express();
 const jwt = require('express-jwt');
+const upload = require('./helpers/uploads');
 const config = require('./helpers/config');
 let passport = require('passport');
 let strategies = require('./helpers/strategies');
 //const fileUpload = require('express-fileupload');
 let auth = require('./middlewares/isAuth');
 let http = require("http").Server(app);
-const io = require('socket.io')(http);
+//const io = require('socket.io')(http);
+const server = require('./helpers/socketconfig');
+server.listen(config.socketPort);
 
 app.use('/views', express.static(__dirname + '/public'));
 app.use(express.json());
@@ -30,6 +33,7 @@ app.get('/', function(req, res) {
 //   require(models_path+'/'+file);
 // });
 // app.use(fileUpload());
+
 app.use(auth.isValidToken);
 passport.use(strategies.localStrategy);
 passport.use(strategies.jwtStrategy);
@@ -45,8 +49,7 @@ http.listen(config.port, function() {
 
 
 /*                  AQUI EMPIEZA SOCKET.IO                      */
-
-io.sockets.on('connection', socket => {
+/*io.sockets.on('connection', socket => {
     console.log('conectao');
         socket.on('hola', data => {
             console.log(data);
@@ -68,6 +71,6 @@ io.sockets.on('connection', socket => {
             console.log('bye')
             let index = users[socket.room].findIndex(el => el === socket.nickname);
             users[socket.room].splice(index, 1);
-          });*/
+          });
 
-});
+});*/
