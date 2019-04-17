@@ -94,6 +94,7 @@ module.exports.getDataFromChat = async (req, target) => {
             });
         }else{
             const data = await db.any(sql.getListMessages, [exists.chatId]);
+            const chat = await db.any(sql.getChat, [exists.chatId]);
             data.map(el => {
              el.isMine = (el.users_id === req.user.users_id ? true : false);
             });
@@ -101,7 +102,8 @@ module.exports.getDataFromChat = async (req, target) => {
             return ({
                 status:200,
                 participants: participants,
-                messages: data
+                messages: data,
+                chat: chat
             });
         }
     }catch(e){
