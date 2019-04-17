@@ -94,6 +94,9 @@ module.exports.getDataFromChat = async (req, target) => {
             });
         }else{
             const data = await db.any(sql.getListMessages, [exists.chatId]);
+            data.map(el => {
+             el.isMine = (el.users_id === req.user.users_id ? true : false);
+            });
             const participants = await db.any(sql.getConversationParticipants, [exists.chatId]);
             return ({
                 status:200,

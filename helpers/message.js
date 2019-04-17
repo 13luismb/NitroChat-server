@@ -1,9 +1,13 @@
 const db = require('./db');
 const sql = require('./queries.js');
 
-module.exports.getListMessage = async (chatId) => {
+module.exports.getListMessage = async (req, chatId) => {
     try{
         const messages = await db.any(sql.getListMessages, [chatId]);
+        await Promise.all(messages.map(async el => {
+            console.log('que es la verga');
+            el.isMine = (el.users_id === req.user.users_id ? true : false);
+        }));
         return ({
             status: 200,
             messages: messages
