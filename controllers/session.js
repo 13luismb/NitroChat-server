@@ -4,7 +4,7 @@ const auth = require('./../middlewares/jwtAuth');
 const jwt = require('jsonwebtoken');
 let router = express.Router();
 const User = require('./../helpers/users');
-const upload = require('./../helpers/uploads');
+const multer = require('./../helpers/multer');
 const config = require('./../helpers/config');
 
 router.post('/login', function(req, res, next) {
@@ -79,7 +79,7 @@ router.put('/updateProfile', async (req,res)=>{
     }
 });
 
-router.post('/updatePicture', auth, upload.single('image'), async (req,res) => {
+router.post('/updatePicture', auth, multer.single('image'), async (req,res) => {
     try{
         const resp = await User.updateProfilePicture(req);
         if(resp.status ===200){

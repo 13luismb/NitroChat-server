@@ -20,7 +20,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(jwt({
     secret: config.secret
 }).unless({
-    path: ['/login', '/register', '/', '/culo']
+    path: ['/login', '/register', '/']
 }));
 app.use(passport.initialize());
 app.use(passport.session());

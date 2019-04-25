@@ -1,49 +1,59 @@
-const multer = require('multer');
-const bcrypt = require('bcryptjs');
 var fs = require('fs');
+var base64ToImage = require('base64-to-image');
 
-let storage = multer.diskStorage({
-    destination: function(req, file, cb) {
-                let dir = `./public/uploads/${req.user.users_id}`;
+module.exports.storeFile = (file, chatId) => {
+    let dir = `./public/uploads/${chatId}/`;
 
-                if (!fs.existsSync(dir)) {
-                    fs.mkdirSync(dir);
-                }
-                cb(null, dir);
-
-    },
-    filename: function(req, file, cb) {
-        let type;
-        switch(file.mimetype){
-            case 'image/jpeg': type = `.jpeg`; break;
-            case 'image/jpg': type = '.jpg'; break;
-            case 'image/png': type = '.png'; break;
-            case 'image/gif': type = '.gif'; break;
-        }
-        cb(null, `${new Date().getTime()}${type}`)
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir);
     }
-});
+    const filename = `${new Date().getTime()}`;
+    const myFile = handleImage(file, dir, {'fileName':`${filename}`, 'type':'jpg'});
+    dir = dir.replace('public','views');
+    return `${dir}${filename}.jpg`;
+}
 
-const upload = multer({
-    storage: storage,
-    fileFilter: function(req, file, cb) {
-        switch (file.mimetype) {
-            case 'image/jpeg':
-                cb(null, true)
-                break;
-            case 'image/jpg':
-                cb(null, true)
-                break;
-            case 'image/png':
-                cb(null, true)
-                break;
-            case 'image/gif':
-                cb(null, true)
-                break;
-            default:
-                return cb(new Error('Wrong file type'))
-        }
+const handleImage = (file, path, options=null) => {
+    return base64ToImage(file, path, options);
+}
+
+/*
+const handleImage= (imageData) => {
+    let imageFile;
+    try {
+      const base64ContentArray = imageData.split(',');
+      const mimeType = base64ContentArray[0].match(/[^:\s*]\w+\/[\w-+\d.]+(?=[;| ])/)[0];
+      imageFile = base64toBlob(
+          base64ContentArray[1],
+          mimeType
+      );
+    } catch (error) {
+      console.log(error);
+      return null;
     }
-});
 
-module.exports = upload;
+    return imageFile;
+  }
+
+  const base64toBlob= (base64Data, contentType) => {
+    contentType = contentType || '';
+    const sliceSize = 1024;
+    const byteCharacters = window.atob(base64Data);
+    const bytesLength = byteCharacters.length;
+    const slicesCount = Math.ceil(bytesLength / sliceSize);
+    const byteArrays = new Array(slicesCount);
+
+    for (let sliceIndex = 0; sliceIndex < slicesCount; ++sliceIndex) {
+      const begin = sliceIndex * sliceSize;
+      const end = Math.min(begin + sliceSize, bytesLength);
+
+      const bytes = new Array(end - begin);
+      for (let offset = begin, i = 0; offset < end; ++i, ++offset) {
+        bytes[i] = byteCharacters[offset].charCodeAt(0);
+      }
+      byteArrays[sliceIndex] = new Uint8Array(bytes);
+    }
+    return new Blob(byteArrays, { type: contentType });
+  }
+*/
+

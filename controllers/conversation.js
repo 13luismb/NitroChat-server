@@ -2,15 +2,18 @@ const express = require('express');
 const auth = require('./../middlewares/jwtAuth');
 let router = express.Router();
 const Chat = require('./../helpers/conversation');
+const io = require('./../helpers/socketconfig');
 
 /*              IT WORKS                */
-    router.get('/chats/:userId', auth, async (req,res) => {
+/*              THIS IS NECESSARY           */
+
+  router.get('/chats/:userId', auth, async (req,res) => {
         try{
             const resp = await Chat.getDataFromChat(req, req.params.userId);
-            console.log(resp);
+            io.sockets.in('hola').emit(console.log('soltame ya',resp));
             res.status(resp.status).send(resp);
         }catch(e){
-            res.status(500).send(err);
+            res.status(500).send(e);
         }
     });
 
