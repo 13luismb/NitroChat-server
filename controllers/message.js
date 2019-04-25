@@ -8,9 +8,24 @@ const io = require('./../helpers/socketconfig');
 
 /*                  IT WORKS                */
 io.sockets.on('connection', socket =>{
-	socket.on('onMessageSend', data => {
-		socket.emit('onMessageReceive', data);
-		socket.emit('onMessageInDashboard', data);
+	console.log('connected');
+	 socket.on("disconnect", function() {
+    console.log('bye')
+  });
+	socket.on('open-app', data => {
+		console.log (data);
+		socket.room = data.room;
+		socket.join(data.room);
+	})
+	socket.on('open-chat', data => {
+		socket.room = data.room;
+		socket.join(data.room);
+		console.log(Object.keys(socket.rooms));
+	})
+	socket.on('send-msg', data => {
+		console.log(data);
+		io.sockets.in(data.room).emit('get-msg', data);
+		io.sockets.in(data.room).emit('dash-msg', data);
 	});
 	socket.on('onMessageUpdate', data => {
 		socket.emit('onReceiveUpdate', data);
