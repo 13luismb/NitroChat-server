@@ -68,3 +68,27 @@ module.exports.updateMessage = async (messageId, body) => {
         }
     }
 };
+
+module.exports.getDataFromChat = async (req, chatId) => {
+    try{
+            const data = await db.any(sql.getListMessages, [chatId]);
+            const chat = await db.oneOrNone(sql.getChat, [chatId]);
+            data.map(el => {
+             el.isMine = (el.users_id === req.user.users_id ? true : false);
+            });
+            const participants = await db.any(sql.getConversationParticipants, [chatId]);
+            return ({
+                status:200,
+                participants: participants,
+                messages: data,
+                chat: chat
+            });
+    }catch(e){
+        console.log(e);
+        return ({
+            error: e,
+            status: 500,
+            message: 'no hay vida'
+        })
+    }
+}

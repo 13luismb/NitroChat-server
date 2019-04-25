@@ -25,7 +25,7 @@ io.sockets.on('connection', socket =>{
     router.get('/chats/:chatId/messages', auth, async (req,res)=>{
         try{
             console.log(req.params.chatId);
-            const resp = await Message.getListMessage(req, req.params.chatId);
+            const resp = await Message.getDataFromChat(req, req.params.chatId);
             res.status(resp.status).send(resp);
         }catch(err){
             res.send(500).send(err);

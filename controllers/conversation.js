@@ -7,6 +7,8 @@ const io = require('./../helpers/socketconfig');
 /*              IT WORKS                */
 /*              THIS IS NECESSARY           */
 
+
+
   router.get('/chats/:userId', auth, async (req,res) => {
         try{
             const resp = await Chat.getDataFromChat(req, req.params.userId);
@@ -16,6 +18,16 @@ const io = require('./../helpers/socketconfig');
             res.status(500).send(e);
         }
     });
+/*
+    router.get('/chats/:chatId/messages', auth, async (req,res) => {
+        try{
+            const resp = await Chat.getDataFromChat(req, req.params.userId);
+            io.sockets.in('hola').emit(console.log('soltame ya',resp));
+            res.status(resp.status).send(resp);
+        }catch(e){
+            res.status(500).send(e);
+        }
+    });*/
 
     router.get('/chats', auth, async (req,res)=>{
         try{

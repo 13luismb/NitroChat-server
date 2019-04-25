@@ -34,9 +34,10 @@ module.exports.newConversation = async (req, type, converName, users) => {
 module.exports.getListChats = async (req) => {
     try{
         let c = await db.any(sql.getListConversation, [req.user.users_id]);
-        await Promise.all(c.map(async el => {
+        await Promise.all(c.map(async (el, index) => {
             el.participants = await db.any(sql.getConversationParticipants, [el.conversations_id]);
-            el.last_message = await db.any(sql.getLastMessage, [el.conversations_id]);
+            el.last_message = await db.oneOrNone(sql.getLastMessage, [el.conversations_id]);
+            if (el.last_message === null) c.splice(index, 1);
         }));
         return ({
             status: 200,
@@ -94,7 +95,7 @@ module.exports.getDataFromChat = async (req, target) => {
             });
         }else{
             const data = await db.any(sql.getListMessages, [exists.chatId]);
-            const chat = await db.any(sql.getChat, [exists.chatId]);
+            const chat = await db.oneOrNone(sql.getChat, [exists.chatId]);
             data.map(el => {
              el.isMine = (el.users_id === req.user.users_id ? true : false);
             });
