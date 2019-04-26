@@ -66,7 +66,8 @@ module.exports.doesChatExist = async (req, target) => {
                     if (m.conversations_id === n.conversations_id){
                         return ({
                             res: true,
-                            chatId: m.conversations_id
+                            chatId: m.conversations_id,
+                            deleted_at: m.deleted_at
                         })
                     }
                 }
@@ -99,7 +100,12 @@ module.exports.getDataFromChat = async (req, target) => {
                 chat: chat
             });
         }else{
-            const data = await db.any(sql.getListMessages, [exists.chatId]);
+            let data;
+            if (exists.deleted_at){
+            data = await db.any(sql.getListMessages, [exists.chatId]);
+            }else{
+            data = await db.any(sql.getDeletedListMessages, [exists.chatId, exists.deleted_at]);
+            }
             const chat = await db.oneOrNone(sql.getChat, [exists.chatId]);
             data.map(el => {
              el.isMine = (el.users_id === req.user.users_id ? true : false);

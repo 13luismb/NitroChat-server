@@ -78,7 +78,21 @@ module.exports.updateMessage = async (messageId, body) => {
 
 module.exports.getDataFromChat = async (req, chatId) => {
     try{
-            const data = await db.any(sql.getListMessages, [chatId]);
+            const chatdata = await db.any(sql.getConversationParticipants, [chatId]);
+            console.log(chatdata);
+            let deletedAt;
+            for (let a of chatdata){
+                if (a.users_id === req.user.users_id){
+                    deletedAt = a.deleted_at;
+                }
+            }
+            console.log(deletedAt)
+            let data;
+            if (deletedAt===null){
+            data = await db.any(sql.getListMessages, [chatId]);
+            }else{
+            data = await db.any(sql.getDeletedListMessages, [chatId, deletedAt]);
+            }
             const chat = await db.oneOrNone(sql.getChat, [chatId]);
             data.map(el => {
              el.isMine = (el.users_id === req.user.users_id ? true : false);
