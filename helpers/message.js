@@ -5,7 +5,6 @@ module.exports.getListMessage = async (req, chatId) => {
     try{
         const messages = await db.any(sql.getListMessages, [chatId]);
         await Promise.all(messages.map(async el => {
-            console.log('que es la verga');
             el.isMine = (el.users_id === req.user.users_id ? true : false);
         }));
         return ({
@@ -62,10 +61,11 @@ module.exports.deleteMessage = async (chatId, messageId) => {
 
 module.exports.updateMessage = async (messageId, body) => {
     try{
-        await db.none(sql.updateMessage, [body, messageId]);
+        const data = await db.one(sql.editMessage, [body, messageId]);
         return ({
             status: 200,
-            message:'updated'
+            message:'updated',
+            message: data
         });
     }catch(e){
         console.log(e);

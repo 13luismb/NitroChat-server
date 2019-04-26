@@ -27,6 +27,16 @@ const io = require('./../helpers/socketconfig');
             res.status(500).send(err);
         }
     });
+
+
+    router.delete('/chats/:chatId/:userId', auth, async (req,res) => {
+        try{
+            const resp = await Chat.deleteChat(req.params.chatId, req.params.userId);
+            res.status(resp.status).send(resp);
+        }catch(e){
+            res.status(500).send(e);
+        }
+    });
 /*
     router.get('/chats/:chatId/messages', auth, async (req,res) => {
         try{

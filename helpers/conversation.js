@@ -120,3 +120,20 @@ module.exports.getDataFromChat = async (req, target) => {
         })
     }
 }
+
+module.exports.deleteChat = async (chat, user) => {
+    try{
+        await db.none(sql.deleteConversation, [new Date(), user, chat]);
+        return({
+            status: 200,
+            msg: 'deleted',
+            chatId: chat
+        })
+    }catch(e){
+        console.log(e);
+        return({
+            status:500,
+            error: e
+        })
+    }
+}

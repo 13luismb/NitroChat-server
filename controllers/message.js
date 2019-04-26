@@ -4,6 +4,8 @@ const auth = require('./../middlewares/jwtAuth');
 const http = require('./../index');
 const upload = require('./../helpers/uploads');
 const Message = require('./../helpers/message');
+const db = require('./../helpers/db');
+const sql = require('./../helpers/queries.js');
 const io = require('./../helpers/socketconfig');
 
 /*                  IT WORKS                */
@@ -14,7 +16,6 @@ io.sockets.on('connection', socket =>{
   });
 	/* 		WORKING PERFECTLY 		*/
 	socket.on('open-app', data => {
-		console.log (data);
 		socket.room = data.room;
 		socket.join(data.room);
 	})
@@ -24,7 +25,6 @@ io.sockets.on('connection', socket =>{
 		console.log(Object.keys(socket.rooms));
 	})
 	socket.on('send-msg', async data => {
-		console.log(data);
         let resp;
         if (data.attachment === null){
           resp  = await Message.createMessage(data.id, data.chatId, null, data.message);
@@ -32,18 +32,18 @@ io.sockets.on('connection', socket =>{
             const file = upload.storeFile(data.attachment, data.chatId);
             resp  = await Message.createMessage(data.id, data.chatId, file, data.message);
         }
-		//db logic missing here
+        await db.none(sql.undeleteConversation, [data.chatId]);
 		io.sockets.in(data.room).emit('get-msg', resp.message);
 		io.sockets.in(data.user).emit('dash-msg', resp.message);
 	});
 
 	/*		NEEDS TO BE FINISHED		*/
-	socket.on('onMessageUpdate', data => {
-		socket.emit('onReceiveUpdate', data);
+	socket.on('update-msg', async data => {
+        const resp = await Message.updateMessage(data.messageId, data.message);
+		io.sockets.in(data.room).emit('receive-update', resp);
 	});
 	socket.on('delete-msg', async data => {
         const resp = await Message.deleteMessage(data.chatId, data.messageId);
-        console.log(data, 'te mariquiaste o q');
 		io.sockets.in(data.room).emit('message-was-deleted', data);
 	});
 })
