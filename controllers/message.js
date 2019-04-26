@@ -12,26 +12,39 @@ io.sockets.on('connection', socket =>{
 	 socket.on("disconnect", function() {
     console.log('bye')
   });
+	/* 		WORKING PERFECTLY 		*/
 	socket.on('open-app', data => {
 		console.log (data);
 		socket.room = data.room;
 		socket.join(data.room);
 	})
 	socket.on('open-chat', data => {
-		socket.room = data.room;
+		// socket.room = data.room;
 		socket.join(data.room);
 		console.log(Object.keys(socket.rooms));
 	})
-	socket.on('send-msg', data => {
+	socket.on('send-msg', async data => {
 		console.log(data);
-		io.sockets.in(data.room).emit('get-msg', data);
-		io.sockets.in(data.room).emit('dash-msg', data);
+        let resp;
+        if (data.attachment === null){
+          resp  = await Message.createMessage(data.id, data.chatId, null, data.message);
+        }else{
+            const file = upload.storeFile(data.attachment, data.chatId);
+            resp  = await Message.createMessage(data.id, data.chatId, file, data.message);
+        }
+		//db logic missing here
+		io.sockets.in(data.room).emit('get-msg', resp.message);
+		io.sockets.in(data.user).emit('dash-msg', resp.message);
 	});
+
+	/*		NEEDS TO BE FINISHED		*/
 	socket.on('onMessageUpdate', data => {
 		socket.emit('onReceiveUpdate', data);
 	});
-	socket.on('onDeleteMessage', data => {
-		socket.emit('onReceiveDelete', data);
+	socket.on('delete-msg', async data => {
+        const resp = await Message.deleteMessage(data.chatId, data.messageId);
+        console.log(data, 'te mariquiaste o q');
+		io.sockets.in(data.room).emit('message-was-deleted', data);
 	});
 })
 

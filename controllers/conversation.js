@@ -12,10 +12,19 @@ const io = require('./../helpers/socketconfig');
   router.get('/chats/:userId', auth, async (req,res) => {
         try{
             const resp = await Chat.getDataFromChat(req, req.params.userId);
-            io.sockets.in('hola').emit(console.log('soltame ya',resp));
             res.status(resp.status).send(resp);
         }catch(e){
             res.status(500).send(e);
+        }
+    });
+
+      router.get('/chats', auth, async (req,res)=>{
+        try{
+            const resp = await Chat.getListChats(req);
+            console.log(resp);
+            res.status(resp.status).send(resp);
+        }catch(err){
+            res.status(500).send(err);
         }
     });
 /*
@@ -29,15 +38,6 @@ const io = require('./../helpers/socketconfig');
         }
     });*/
 
-    router.get('/chats', auth, async (req,res)=>{
-        try{
-            const resp = await Chat.getListChats(req);
-            console.log(resp);
-            res.status(resp.status).send(resp);
-        }catch(err){
-            res.status(500).send(err);
-        }
-    });
     
 /*             DOESNT WORK              */
 

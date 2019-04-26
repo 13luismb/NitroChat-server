@@ -34,15 +34,17 @@ module.exports.newConversation = async (req, type, converName, users) => {
 module.exports.getListChats = async (req) => {
     try{
         let c = await db.any(sql.getListConversation, [req.user.users_id]);
-        console.log(c);
-        await Promise.all(c.map(async (el, index) => {
+        let chats = [];
+        chats = await Promise.all(c.map(async (el, index) => {
             el.participants = await db.any(sql.getConversationParticipants, [el.conversations_id]);
             el.last_message = await db.oneOrNone(sql.getLastMessage, [el.conversations_id]);
-            if (el.last_message === null) c.splice(index, 1);
+            if (el.last_message === null) console.log('dude');
+            else return el
         }));
+        console.log(chats);
         return ({
             status: 200,
-            chats: c
+            chats: chats
         });
     }catch(e){
         console.log(e);
@@ -87,12 +89,13 @@ module.exports.getDataFromChat = async (req, target) => {
         const exists = await this.doesChatExist(req,target);
         if (!exists.res){
             const chat = await db.one(sql.createConversation, [1, req.user.users_id, null,new Date()]);
-            await db.none(sql.createUsersConversation, [req.user.users_id, 1, chat.conversations_id]);
             await db.none(sql.createUsersConversation, [target, 1, chat.conversations_id]);
+            await db.none(sql.createUsersConversation, [req.user.users_id, 1, chat.conversations_id]);
             const participants = await db.any(sql.getConversationParticipants, [chat.conversations_id]);
             return ({
                 status:201,
-                participants: participants
+                participants: participants,
+                chat: chat
             });
         }else{
             const data = await db.any(sql.getListMessages, [exists.chatId]);
