@@ -34,6 +34,7 @@ module.exports.newConversation = async (req, type, converName, users) => {
 module.exports.getListChats = async (req) => {
     try{
         let c = await db.any(sql.getListConversation, [req.user.users_id]);
+        console.log(c);
         let chats = [];
         chats = await Promise.all(c.map(async (el, index) => {
             el.participants = await db.any(sql.getConversationParticipants, [el.conversations_id]);
