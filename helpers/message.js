@@ -23,11 +23,14 @@ module.exports.getListMessage = async (req, chatId) => {
 
 module.exports.createMessage = async (usersId, chatId, attachment, body) => {
     try{
-        const message = await db.one(sql.createMessage, [usersId, chatId, attachment, body, new Date()]);
+        var today = new Date();
+        var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+        var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+        var dateTime = date+' '+time;
+        const message = await db.one(sql.createMessage, [usersId, chatId, attachment, body, dateTime]);
         const simpleInfo = await db.one(sql.getSimpleInfo, [usersId]);
         message.users_name = simpleInfo.users_name;
         message.users_username = simpleInfo.users_name;
-        message.isMine = true;
         return ({
             status: 200,
             message: message
