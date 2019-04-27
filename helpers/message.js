@@ -79,21 +79,20 @@ module.exports.updateMessage = async (messageId, body) => {
 module.exports.getDataFromChat = async (req, chatId) => {
     try{
             const chatdata = await db.any(sql.getConversationParticipants, [chatId]);
-            console.log(chatdata);
             let deletedAt;
             for (let a of chatdata){
                 if (a.users_id === req.user.users_id){
                     deletedAt = a.deleted_at;
                 }
             }
-            console.log(deletedAt)
+            console.log('qverga es',deletedAt)
             let data;
-            if (deletedAt===null){
+            if (deletedAt === null){
             data = await db.any(sql.getListMessages, [chatId]);
             }else{
             data = await db.any(sql.getDeletedListMessages, [chatId, deletedAt]);
             }
-            const chat = await db.oneOrNone(sql.getChat, [chatId]);
+            const chat = await db.oneOrNone(sql.getSingleChat, [chatId]);
             data.map(el => {
              el.isMine = (el.users_id === req.user.users_id ? true : false);
             });

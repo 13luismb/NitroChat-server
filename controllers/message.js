@@ -32,9 +32,12 @@ io.sockets.on('connection', socket =>{
             const file = upload.storeFile(data.attachment, data.chatId);
             resp  = await Message.createMessage(data.id, data.chatId, file, data.message);
         }
+        let chat = await db.one(sql.getSingleChat, [data.chatId]);
+        chat.participants = await db.any(sql.getConversationParticipants, [data.chatId]);
+        chat.last_message = resp.message;
         await db.none(sql.undeleteConversation, [data.chatId]);
 		io.sockets.in(data.room).emit('get-msg', resp.message);
-		io.sockets.in(data.user).emit('dash-msg', resp.message);
+		io.sockets.in(data.user).emit('dash-msg', chat);
 	});
 
 	/*		NEEDS TO BE FINISHED		*/
