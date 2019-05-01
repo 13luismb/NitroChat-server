@@ -13,7 +13,11 @@ module.exports.newConversation = async (req, type, converName, users) => {
         }
        const conversation = await  db.one(sql.createConversation, [type, req.user.users_id, conversationName, new Date() ]);
         for (user of users){
-            await db.none(sql.createUsersConversation, [user, type, conversation.conversations_id]);
+            if(user === req.user.users_id){
+                await db.none(sql.createUsersConversation, [req.user.users_id, 2, conversation.conversations_id]);
+            }else{
+                await db.none(sql.createUsersConversation, [user, 1, conversation.conversations_id]);   
+            }
         }
         totalUsers = await db.any(sql.getConversationParticipants, [conversation.conversations_id]);
         return ({

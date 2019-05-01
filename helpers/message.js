@@ -97,6 +97,15 @@ module.exports.getDataFromChat = async (req, chatId) => {
              el.isMine = (el.users_id === req.user.users_id ? true : false);
             });
             const participants = await db.any(sql.getConversationParticipants, [chatId]);
+            if(chat.type_conversation_id === 3){
+                participants.map(el => {
+                    el.isDisabled = (el.type_users_id === 2 ? false : true);
+                })
+            }else{
+                participants.map(el => {
+                    el.isDisabled = false;
+                })
+            }
             return ({
                 status:200,
                 participants: participants,

@@ -37,6 +37,7 @@ const io = require('./../helpers/socketconfig');
             res.status(500).send(e);
         }
     });
+
 /*
     router.get('/chats/:chatId/messages', auth, async (req,res) => {
         try{
@@ -53,11 +54,16 @@ const io = require('./../helpers/socketconfig');
 
     router.post('/newChat', async (req,res)=>{
        // const io = req.app.get('socketio');
-        const resp = await Chat.newConversation(req, req.body.type, req.body.converName, req.body.users);
-        if (resp.status === 200){
+        try{
+            const resp = await Chat.newConversation(req, req.body.type, req.body.converName, req.body.users);
+            res.status(resp.status).send(resp);
+        }catch(e){
+            res.send({status:500, error:e});
+        }
+       /* if (resp.status === 200){
             socket.join(resp.conversation_id);
             res.status(200).send(resp)
-        }
+        }*/
     });
 
 

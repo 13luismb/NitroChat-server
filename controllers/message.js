@@ -51,8 +51,6 @@ io.sockets.on('connection', socket =>{
 	});
 })
 
-/*              DOESNT WORK                     */
-  
     router.get('/chats/:chatId/messages', auth, async (req,res)=>{
         try{
             console.log(req.params.chatId);
@@ -62,6 +60,9 @@ io.sockets.on('connection', socket =>{
             res.send(500).send(err);
         }
     });
+
+/*              DOESNT WORK                     */
+  
 
 
     router.post('/chats/:chatId', auth, /*upload.any(),*/  async (req,res)=>{
