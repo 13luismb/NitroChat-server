@@ -55,13 +55,14 @@ io.sockets.on('connection', socket =>{
             if (data.attachment === null){
               resp  = await Message.createMessage(data.id, a.chatId, null, data.message);
             }else{
-                const file = upload.copyImage(data.attachment, a.chatId, data.oldChatId);
-                resp  = await Message.createMessage(data.id, a.chatId, file, data.message);
+                //const file = await upload.copyImage(data.attachment, a.chatId, data.oldChatId);
+                resp  = await Message.createMessage(data.id, a.chatId, data.attachment, data.message);
             }
             let chat = await db.one(sql.getSingleChat, [a.chatId]);
             chat.participants = await db.any(sql.getConversationParticipants, [a.chatId]);
             chat.last_message = resp.message;
             await db.none(sql.undeleteConversation, [a.chatId]);
+            console.log(a.room);
             io.sockets.in(a.room).emit('get-msg', resp.message);
             for (let b of a.user){
                  io.sockets.in(user, b).emit('dash-msg', chat);
