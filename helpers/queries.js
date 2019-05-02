@@ -21,6 +21,8 @@ let queries = {
         getListChannelOrGroup: new PS('get-channels-groups','select co.* from conversations co inner join conversations_users cu on co.conversations_id = cu.conversations_id WHERE co.type_conversation_id = 2 OR type_conversation_id = 3 AND cu.is_deleted is null and cu.users_id = $1 OR cu.is_deleted = false AND cu.users_id = $1'),
         getConversationParticipants: new PS('get-participants', 'select cu.*, us.* from conversations co inner join conversations_users cu on co.conversations_id = cu.conversations_id INNER JOIN users us ON cu.users_id = us.users_id WHERE cu.conversations_id = $1'),
         deleteConversation: new PS('delete-chat','UPDATE conversations_users SET deleted_at=$1, is_deleted=true WHERE users_id = $2 AND conversations_id = $3'),
+        getOutOfGroup: new PS('out-of-group','DELETE FROM CONVERSATIONS_USERS WHERE conversations_id = $1 AND users_id = $2'),
+        deleteGroup: new PS('delete-group', 'DELETE FROM CONVERSATIONS WHERE CONVERSATIONS_ID = $1'),
         undeleteConversation: new PS('undelete-chat', 'UPDATE conversations_users SET is_deleted = false WHERE conversations_id=$1'),
         createMessage: new PS('create-message','INSERT INTO MESSAGE (users_id, conversations_id, message_attachment, message_body, created_at) VALUES ($1, $2, $3, $4, $5) RETURNING *'),
         getDeletedListMessages: new PS('get-deleted-messages','SELECT me.*, us.users_username, us.users_name FROM MESSAGE me INNER JOIN USERS us ON us.users_id = me.users_id WHERE me.conversations_id = $1 and me.created_at > $2 ORDER BY me.created_at'),

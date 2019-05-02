@@ -40,22 +40,8 @@ const io = require('./../helpers/socketconfig');
         }
     });
 
-/*
-    router.get('/chats/:chatId/messages', auth, async (req,res) => {
-        try{
-            const resp = await Chat.getDataFromChat(req, req.params.userId);
-            io.sockets.in('hola').emit(console.log('soltame ya',resp));
-            res.status(resp.status).send(resp);
-        }catch(e){
-            res.status(500).send(e);
-        }
-    });*/
 
-    
-/*             DOESNT WORK              */
-
-    router.post('/newChat', async (req,res)=>{
-       // const io = req.app.get('socketio');
+    router.post('/newChat', auth, async (req,res)=>{
         try{
             const resp = await Chat.newConversation(req, req.body.type, req.body.converName, req.body.users);
             const message = {...resp.conversation, last_message: resp.message, participants: resp.participants};
@@ -75,11 +61,44 @@ const io = require('./../helpers/socketconfig');
             console.log(e);
             res.send({status:500, error:e});
         }
-       /* if (resp.status === 200){
-            socket.join(resp.conversation_id);
-            res.status(200).send(resp)
-        }*/
     });
+
+    router.delete('/group/:chatId/:userId', auth, async (req, res) => {
+        const {chatId, userId} = req.params;
+        try{
+            const resp = await Chat.outOfGroup(chatId, userId);
+            io.sockets.in(`chat ${chatId}`).emit('get-msg', resp.message);
+            res.status(resp.status).send(resp);
+        }catch(e){
+            console.log(e);
+            res.status(500).send({status:500, error: e});
+        }
+    });
+
+    router.delete('/group/:chatId', auth, async (req, res) => {
+        const {chatId} = req.params;
+        try{
+            const resp = await Chat.eraseGroup(chatId);
+            res.status(resp.status).send(resp);
+        }catch(e){
+            res.status(500).send({status:500,error:e})
+        }
+    })
+
+/*
+    router.get('/chats/:chatId/messages', auth, async (req,res) => {
+        try{
+            const resp = await Chat.getDataFromChat(req, req.params.userId);
+            io.sockets.in('hola').emit(console.log('soltame ya',resp));
+            res.status(resp.status).send(resp);
+        }catch(e){
+            res.status(500).send(e);
+        }
+    });*/
+
+    
+/*             DOESNT WORK              */
+
 
 
 module.exports = router;

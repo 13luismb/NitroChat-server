@@ -154,6 +154,25 @@ module.exports.deleteChat = async (chat, user) => {
     }
 }
 
+module.exports.outOfGroup = async (chatId, userId) => {
+    try{
+        let message  = await Message.createMessage(userId, chatId, null, 'has left the group');
+        await db.none(sql.getOutOfGroup, [chatId, userId]);
+        return ({status:200, message:message.message});
+    }catch (e) {
+        return ({status:500, error:e})
+    }
+}
+
+module.exports.eraseGroup = async (chatId) => {
+    try{
+        await db.none(sql.deleteGroup, [chatId]);
+        return ({status:200, msg:'group deleted'});
+    }catch (e){
+        return ({status:500, error:e})
+    }
+}
+
 /*const orderArrayByMessage = (array) => {
     let aux;
     for (let i=0; i<array.length-1; i++){
