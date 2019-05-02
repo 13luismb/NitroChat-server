@@ -85,7 +85,6 @@ module.exports.getDataFromChat = async (req, chatId) => {
                     deletedAt = a.deleted_at;
                 }
             }
-            console.log('qverga es',deletedAt)
             let data;
             if (deletedAt === null){
             data = await db.any(sql.getListMessages, [chatId]);
