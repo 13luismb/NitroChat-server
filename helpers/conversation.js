@@ -151,10 +151,9 @@ module.exports.deleteChat = async (chat, user) => {
     }
 }
 
-const orderArrayByMessage = (array) => {
+/*const orderArrayByMessage = (array) => {
     let aux;
     for (let i=0; i<array.length-1; i++){
-        console.log('sisisi');
         console.log(array[i].last_message.created_at < array[i+1].last_message.created_at);
         if (array[i].last_message.created_at < array[i+1].last_message.created_at){
             aux = array[i];
@@ -171,4 +170,15 @@ const orderArrayByMessage = (array) => {
         }
     }
     return array;
+}*/
+
+const orderArrayByMessage = (array) => {
+    return array.sort((a,b)=> {
+            if(a.last_message.created_at < b.last_message.created_at){
+                return 1;
+            }else if (a.last_message.created_at > b.last_message.created_at){
+                return -1;
+            }   
+            return 0;
+        })
 }

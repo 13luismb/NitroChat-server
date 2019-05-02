@@ -22,7 +22,7 @@ let queries = {
         deleteConversation: new PS('delete-chat','UPDATE conversations_users SET deleted_at=$1, is_deleted=true WHERE users_id = $2 AND conversations_id = $3'),
         undeleteConversation: new PS('undelete-chat', 'UPDATE conversations_users SET is_deleted = false WHERE conversations_id=$1'),
         createMessage: new PS('create-message','INSERT INTO MESSAGE (users_id, conversations_id, message_attachment, message_body, created_at) VALUES ($1, $2, $3, $4, $5) RETURNING *'),
-        getDeletedListMessages: new PS('get-messages','SELECT me.*, us.users_username, us.users_name FROM MESSAGE me INNER JOIN USERS us ON us.users_id = me.users_id WHERE me.conversations_id = $1 and me.created_at > $2 ORDER BY me.created_at'),
+        getDeletedListMessages: new PS('get-deleted-messages','SELECT me.*, us.users_username, us.users_name FROM MESSAGE me INNER JOIN USERS us ON us.users_id = me.users_id WHERE me.conversations_id = $1 and me.created_at > $2 ORDER BY me.created_at'),
         getListMessages: new PS('get-messages','SELECT me.*, us.users_username, us.users_name FROM MESSAGE me INNER JOIN USERS us ON us.users_id = me.users_id WHERE me.conversations_id = $1 ORDER BY me.created_at'),
         deleteMessage: new PS('delete-message','DELETE FROM MESSAGE WHERE message_id = $1 AND conversations_id = $2'),
         editMessage: new PS('edit-message','UPDATE MESSAGE SET message_body = $1 WHERE message_id= $2 RETURNING *'),

@@ -46,31 +46,3 @@ passport.deserializeUser(function(user, done) {
 http.listen(config.port, function() {
     console.log('Example app listening on port 3001!');
 });
-
-
-/*                  AQUI EMPIEZA SOCKET.IO                      */
-io.sockets.on('connection', socket => {
-    console.log('conectao');
-        socket.on('hola', data => {
-            console.log(data);
-        })
-        socket.on('send-message', message => {
-            
-        });
-        socket.on('enter-chat', async data => {
-        //    const resp = await Message.getListMessage(data.chatId);
-            socket.emit('get-messages', resp);
-        });
-/*
-        socket.on('initiate-chat', async data => {
-            const resp = await Conversation.newConversation(data.token, data.type, data.converName, data.users);
-            socket.emit('enter-chat', resp);
-        });
-
-        socket.on("disconnect", function() {
-            console.log('bye')
-            let index = users[socket.room].findIndex(el => el === socket.nickname);
-            users[socket.room].splice(index, 1);
-          });*/
-
-});

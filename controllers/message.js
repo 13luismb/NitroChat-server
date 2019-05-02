@@ -8,6 +8,7 @@ const db = require('./../helpers/db');
 const sql = require('./../helpers/queries.js');
 const io = require('./../helpers/socketconfig');
 
+
 /*                  IT WORKS                */
 io.sockets.on('connection', socket =>{
 	console.log('connected');
@@ -24,8 +25,12 @@ io.sockets.on('connection', socket =>{
 		socket.join(data.room);
 		console.log(Object.keys(socket.rooms));
 	})
+    socket.on('leave-chat', data => {
+        socket.leave(data.room);
+    })
 	socket.on('send-msg', async data => {
         let resp;
+        let user = `user`;
         if (data.attachment === null){
           resp  = await Message.createMessage(data.id, data.chatId, null, data.message);
         }else{
@@ -37,8 +42,29 @@ io.sockets.on('connection', socket =>{
         chat.last_message = resp.message;
         await db.none(sql.undeleteConversation, [data.chatId]);
 		io.sockets.in(data.room).emit('get-msg', resp.message);
-		io.sockets.in(data.user).emit('dash-msg', chat);
+        for (let a of data.targets){
+            console.log(user,a);
+        io.sockets.in(user, a).emit('dash-msg', chat);
+        }
 	});
+
+    socket.on('fwd-msg', async data => {
+        for (let a of data.targets){
+            let resp;
+            if (data.attachment === null){
+              resp  = await Message.createMessage(data.id, a.chatId, null, data.message);
+            }else{
+                const file = upload.copyImage(data.attachment, a.chatId, data.oldChatId);
+                resp  = await Message.createMessage(data.id, a.chatId, file, data.message);
+            }
+            let chat = await db.one(sql.getSingleChat, [a.chatId]);
+            chat.participants = await db.any(sql.getConversationParticipants, [a.chatId]);
+            chat.last_message = resp.message;
+            await db.none(sql.undeleteConversation, [a.chatId]);
+            io.sockets.in(a.room).emit('get-msg', resp.message);
+            io.sockets.in(a.user).emit('dash-msg', chat);
+        }
+    });
 
 	/*		NEEDS TO BE FINISHED		*/
 	socket.on('update-msg', async data => {

@@ -1,5 +1,35 @@
 var fs = require('fs');
+const path = require('path');
 var base64ToImage = require('base64-to-image');
+
+module.exports.copyImage = (existingFile, chatId, oldChatId) => {
+  let src = path.join('./.', existingFile.replace('views','public'));
+  let destDir = path.join(__dirname, `./../public/uploads/${chatId}`);
+  const filename = existingFile.replace(`./views/uploads/${oldChatId}/`,'');
+  console.log(destDir);
+    fs.access(destDir, (err) => {
+      if(err)
+        fs.mkdirSync(destDir);
+
+      copyFile(src, path.join(destDir, filename));
+    });
+    return `./views/uploads/${chatId}/${filename}`;
+}
+
+function copyFile(src, dest) {
+
+  let readStream = fs.createReadStream(src);
+
+  readStream.once('error', (err) => {
+    console.log(err);
+  });
+
+  readStream.once('end', () => {
+    console.log('done copying');
+  });
+
+  readStream.pipe(fs.createWriteStream(dest));
+}
 
 module.exports.storeFile = (file, chatId) => {
     let dir = `./public/uploads/${chatId}/`;
