@@ -1,6 +1,5 @@
 const PS = require('pg-promise').PreparedStatement;
 let queries = {
-        
         newUser: new PS('new-user', "INSERT INTO USERS (users_phone, users_username, users_name, users_email, users_password, user_picture_url, users_creation_time) VALUES ($1, $2, $3, $4, $5, $6, $7)"),
         getUser: new PS('get-user', "SELECT * FROM USERS WHERE users_username = $1"),
         getUserByPhone: new PS('get-user-by-phone', 'SELECT * FROM USERS WHERE users_phone = $1'),
@@ -19,6 +18,9 @@ let queries = {
         getSimpleInfo: new PS ('simple-info', 'SELECT users_username, users_name FROM users WHERE users_id = $1'),
         getListConversation: new PS('get-chats','select co.* from conversations co inner join conversations_users cu on co.conversations_id = cu.conversations_id WHERE cu.is_deleted is null and cu.users_id = $1 OR cu.is_deleted = false AND cu.users_id = $1'),
         getListChannelOrGroup: new PS('get-channels-groups','select co.* from conversations co inner join conversations_users cu on co.conversations_id = cu.conversations_id WHERE co.type_conversation_id = 2 OR type_conversation_id = 3 AND cu.is_deleted is null and cu.users_id = $1 OR cu.is_deleted = false AND cu.users_id = $1'),
+        updateGroupPicture: new PS('update-group-picture', 'UPDATE CONVERSATIONS SET conversation_picture_url = $1 WHERE conversations_id = $2'),
+        updateGroupName: new PS('update-group-name', 'UPDATE CONVERSATIONS SET conversation_name = $1 WHERE conversations_id = $2'),
+        newAdminInGroup: new PS('new-admin-in-group','UPDATE CONVERSATIONS_USERS SET type_users_id = 2 WHERE conversations_id = $1 AND users_id = $2'),
         getConversationParticipants: new PS('get-participants', 'select cu.*, us.* from conversations co inner join conversations_users cu on co.conversations_id = cu.conversations_id INNER JOIN users us ON cu.users_id = us.users_id WHERE cu.conversations_id = $1'),
         deleteConversation: new PS('delete-chat','UPDATE conversations_users SET deleted_at=$1, is_deleted=true WHERE users_id = $2 AND conversations_id = $3'),
         getOutOfGroup: new PS('out-of-group','DELETE FROM CONVERSATIONS_USERS WHERE conversations_id = $1 AND users_id = $2'),
@@ -30,7 +32,6 @@ let queries = {
         deleteMessage: new PS('delete-message','DELETE FROM MESSAGE WHERE message_id = $1 AND conversations_id = $2'),
         editMessage: new PS('edit-message','UPDATE MESSAGE SET message_body = $1 WHERE message_id= $2 RETURNING *'),
         searchUser: new PS('search-user', 'SELECT * FROM USERS WHERE LOWER(users_name) LIKE $1')
-
 }
 
 module.exports = queries;

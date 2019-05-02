@@ -81,6 +81,29 @@ io.sockets.on('connection', socket =>{
 	});
 })
 
+
+    /*           DETAILS PAGE SOCKET LOGIC          */
+
+    socket.on('give-admin', async data => {
+
+    });
+
+    socket.on('add-group-member', async data => {
+
+    });
+
+    socket.on('delete-group-member', async data => {
+
+    });
+
+    socket.on('change-group-name', async data => {
+
+    });
+
+
+    /*      SOCKET LOGIC ENDS HERE          */
+
+
     router.get('/chats/:chatId/messages', auth, async (req,res)=>{
         try{
             console.log(req.params.chatId);
@@ -91,9 +114,10 @@ io.sockets.on('connection', socket =>{
         }
     });
 
-/*              DOESNT WORK                     */
-  
+    /*      THESE ARE ALL ENDPOINT/SOCKETS TO BE USED IN THIS CONTROLLER        */
 
+            /*              DOESNT WORK                     */
+  
 
     router.post('/chats/:chatId', auth, /*upload.any(),*/  async (req,res)=>{
         try{

@@ -2,12 +2,11 @@ const express = require('express');
 const auth = require('./../middlewares/jwtAuth');
 let router = express.Router();
 const Chat = require('./../helpers/conversation');
+const multer = require('./../helpers/multer');
 const io = require('./../helpers/socketconfig');
 
 /*              IT WORKS                */
 /*              THIS IS NECESSARY           */
-
-
 
   router.get('/chats/:userId', auth, async (req,res) => {
         try{
@@ -28,7 +27,6 @@ const io = require('./../helpers/socketconfig');
         }
     });
 
-
     router.delete('/chats/:chatId/:userId', auth, async (req,res) => {
         try{
             const resp = await Chat.deleteChat(req.params.chatId, req.params.userId);
@@ -39,7 +37,6 @@ const io = require('./../helpers/socketconfig');
             res.status(500).send(e);
         }
     });
-
 
     router.post('/newChat', auth, async (req,res)=>{
         try{
@@ -83,7 +80,18 @@ const io = require('./../helpers/socketconfig');
         }catch(e){
             res.status(500).send({status:500,error:e})
         }
-    })
+    });
+
+    router.post('/group/:chatId/updatePicture', auth, multer.single('image'), async (req, res) => {
+        const {chatId} = req.params;
+        try{
+            const dir = req.file.path.replace('public','views');
+            const resp = await Chat.updateGroupPic(dir, chatId);
+            io.sockets.in(`chat ${chatId}`).emit('group-profile-updated', dir);
+        }catch(e){
+            res.status(500).send({status:500, error:e});
+        }
+    });
 
 /*
     router.get('/chats/:chatId/messages', auth, async (req,res) => {

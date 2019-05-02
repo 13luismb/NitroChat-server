@@ -173,26 +173,47 @@ module.exports.eraseGroup = async (chatId) => {
     }
 }
 
-/*const orderArrayByMessage = (array) => {
-    let aux;
-    for (let i=0; i<array.length-1; i++){
-        console.log(array[i].last_message.created_at < array[i+1].last_message.created_at);
-        if (array[i].last_message.created_at < array[i+1].last_message.created_at){
-            aux = array[i];
-            array[i] = array[i+1];
-            array[i+1] = aux;
-            if(i>0){
-                if(array[i].last_message.created_at > array[i-1].last_message.created_at){
-                    aux = array[i];
-                    array[i] = array[i-1];
-                    array[i-1] = aux;
-                }     
-            }
-
-        }
+module.exports.updateGroupPic = async (file, chatId) => {
+    try{
+        await db.none(sql.updateGroupPicture, [file, chatId]);
+        return ({status:200, msg:'updated'});
+    }catch(e){
+        return ({status:500, error:e})
     }
-    return array;
-}*/
+}
+//MUST BE FINISHED
+module.exports.createNewAdmin = async (chatId, userId) => {
+    try{
+        await db.none(sql.newAdminInGroup, [chatId, userId]);
+    }catch(e){
+        return ({status:500, error:e});
+    }
+}
+
+//THIS ONE IS PRETTY IMPORTANT
+module.exports.addNewMemberToGroup = async (chatId, userId) => {
+    try{
+        await db.none(sql.createUsersConversation, [chatId, 1, userId]);
+    }catch(e){
+        return ({status:500, error:e});
+    }
+}
+
+module.exports.deleteMemberFromGroup = async (chatId, userId) => {
+    try{
+        await db.none(sql.getOutOfGroup, [chatId, userId]);
+    }catch(e){
+        return ({status:500, error:e});
+    }
+}
+
+module.exports.changeGroupName = async (name, chatId) => {
+    try{
+        await db.none(sql.updateGroupName, [name, chatId]);
+    }catch(e){
+        return ({status:500, error:e});
+    }
+}
 
 const orderArrayByMessage = (array) => {
     return array.sort((a,b)=> {
