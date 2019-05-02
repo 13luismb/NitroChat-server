@@ -1,6 +1,6 @@
 const db = require('./db');
 const sql = require('./queries.js');
-
+const Message = require('./message');
 
 module.exports.newConversation = async (req, type, converName, users) => {
     let totalUsers;
@@ -11,7 +11,7 @@ module.exports.newConversation = async (req, type, converName, users) => {
         }else {
             conversationName = converName;
         }
-       const conversation = await  db.one(sql.createConversation, [type, req.user.users_id, conversationName, new Date() ]);
+       let conversation = await  db.one(sql.createConversation, [type, req.user.users_id, conversationName, new Date() ]);
         for (user of users){
             if(user === req.user.users_id){
                 await db.none(sql.createUsersConversation, [req.user.users_id, 2, conversation.conversations_id]);
@@ -20,11 +20,14 @@ module.exports.newConversation = async (req, type, converName, users) => {
             }
         }
         totalUsers = await db.any(sql.getConversationParticipants, [conversation.conversations_id]);
+        const message  = await Message.createMessage(req.user.users_id, conversation.conversations_id, null, 'created');
         return ({
             status: 200,
             message:'ok',
             conversation_id: conversation.conversations_id,
-            participants: totalUsers
+            conversation: conversation,
+            participants: totalUsers,
+            message: message.message
         });
     }catch(e){
         console.log(e);
