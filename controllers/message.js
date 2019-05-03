@@ -86,8 +86,9 @@ io.sockets.on('connection', socket =>{
     });
 
     socket.on('add-group-member', async data => {
+        console.log(data);
         for (let a of data.targets){
-            const resp = await Chat.addNewMemberToGroup(data.chatId, a, data.userId)
+            let resp = await Chat.addNewMemberToGroup(data.chatId, a, data.userId)
             io.sockets.in(`chat ${data.chatId}`).emit('new-member', resp);
         }
     });

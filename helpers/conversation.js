@@ -228,11 +228,15 @@ module.exports.createNewAdmin = async (chatId, userId, adminId) => {
 //THIS ONE IS PRETTY IMPORTANT
 module.exports.addNewMemberToGroup = async (chatId, userId, adminId) => {
     try{
-        await db.none(sql.createUsersConversation, [chatId, 1, userId]);
+        await db.none(sql.createUsersConversation, [ userId,1,chatId ]);
+        console.log('wut')
         const newUser = await db.one(sql.getSimpleInfo, [userId]);
+        console.log('is this even happening')
         const message  = await Message.createMessage(adminId, chatId, null, `${newUser.users_username} has entered the group`);
+        console.log('mistake')
         return ({status:200, message: message.message});
     }catch(e){
+        console.log(e)
         return ({status:500, error:e});
     }
 }
