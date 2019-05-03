@@ -208,6 +208,7 @@ module.exports.updateGroupPic = async (file, chatId) => {
         await db.none(sql.updateGroupPicture, [file, chatId]);
         return ({status:200, msg:'updated', picture:file});
     }catch(e){
+        console.log(e);
         return ({status:500, error:e})
     }
 }

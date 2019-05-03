@@ -93,10 +93,12 @@ const io = require('./../helpers/socketconfig');
     router.post('/group/:chatId/updatePicture', auth, multer.single('image'), async (req, res) => {
         const {chatId} = req.params;
         try{
+            console.log(req.file);
             const dir = req.file.path.replace('public','views');
             const resp = await Chat.updateGroupPic(dir, chatId);
             io.sockets.in(`chat ${chatId}`).emit('group-profile-updated', dir);
         }catch(e){
+            console.log(e);
             res.status(500).send({status:500, error:e});
         }
     });
