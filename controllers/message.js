@@ -57,6 +57,7 @@ io.sockets.on('connection', socket =>{
 	});
     socket.on('fwd-msg', async data => {
         const user = `user`;
+        const room = `chat`
         for (let a of data.targets){
             let resp;
             if (data.attachment === null){
@@ -68,7 +69,7 @@ io.sockets.on('connection', socket =>{
             chat.participants = await db.any(sql.getConversationParticipants, [a.chatId]);
             chat.last_message = resp.message;
             await db.none(sql.undeleteConversation, [a.chatId]);
-            io.sockets.in(a.room).emit('get-msg', resp.message);
+            io.sockets.in(room, a.chatId).emit('get-msg', resp.message);
             for (let b of a.user){
                  io.sockets.in(user, b).emit('dash-msg', chat);
             }

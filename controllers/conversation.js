@@ -101,6 +101,15 @@ const io = require('./../helpers/socketconfig');
         }
     });
 
+    router.get('/group', auth, async (req, res) => {
+        try{
+            const resp = await Chat.getGroupChats(req);
+            res.status(resp.status).send(resp);
+        }catch(e){
+            res.status(500).send({status:500,error:e});
+        }
+    })
+
 /*
     router.get('/chats/:chatId/messages', auth, async (req,res) => {
         try{

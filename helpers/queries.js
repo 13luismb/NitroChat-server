@@ -12,6 +12,7 @@ let queries = {
         getListStatus: new PS('get-status','SELECT st.* from status st INNER JOIN users_status us ON st.status_id = us.status_id WHERE us.users_id = $1'),
         deleteStatus: new PS('delete-status','DELETE FROM STATUS WHERE status_id = $1'),
         getAllChats: new PS('all-chats', 'select cu.conversations_id, cu.deleted_at from conversations_users  cu inner join conversations co on cu.conversations_id=co.conversations_id where co.type_conversation_id=1 AND cu.users_id = $1'),
+        getGroupChats: new PS('group-chats', 'select co.* from conversations_users  cu inner join conversations co on cu.conversations_id=co.conversations_id where co.type_conversation_id=2 AND cu.users_id = $1'),
         createConversation: new PS('create-chat','insert into conversations (type_conversation_id, creator_id, conversation_name, created_at) VALUES ($1,$2,$3,$4) returning *'),
         createUsersConversation: new PS('create-user-conversation', 'INSERT INTO CONVERSATIONS_USERS (users_id, type_users_id, conversations_id) VALUES ($1,$2,$3)'),
         getSingleChat: new PS('get-chat','SELECT * FROM CONVERSATIONS WHERE conversations_id = $1'),

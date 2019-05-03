@@ -95,6 +95,36 @@ module.exports.doesChatExist = async (req, target) => {
     }
 }
 
+module.exports.interpolateChats = async (userId, targetId) => {
+        try{
+        let userChats = await db.any(sql.getAllChats, userId);
+        let targetChats = await db.any(sql.getAllChats, targetId);
+        if (userChats.length > 0 && targetChats.length > 0){
+            for (let m of userChats){
+                for (let n of targetChats){
+                    if (m.conversations_id === n.conversations_id){
+                        return ({
+                            res: true,
+                            chatId: m.conversations_id,
+                            deleted_at: m.deleted_at
+                        })
+                    }
+                }
+            }
+        }
+        return ({
+            res:false
+        })
+    }catch(e){
+        console.log(e);
+        return {
+            error: e,
+            status: 500,
+            message: 'nop'
+        }
+    }
+}
+
 module.exports.getDataFromChat = async (req, target) => {
     try{
         const exists = await this.doesChatExist(req,target);
@@ -223,6 +253,15 @@ module.exports.changeGroupName = async (name, chatId, adminId) => {
         return ({status:200, message: message.message, name});
     }catch(e){
         return ({status:500, error:e});
+    }
+}
+
+module.exports.getGroupChats = async (req) => {
+    try{
+        const chats = await db.any(sql.getGroupChats, [req.user.users_id]);
+        return ({status:200, chats})
+    }catch (e){
+        return ({status:500, error:e})
     }
 }
 

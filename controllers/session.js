@@ -4,6 +4,7 @@ const auth = require('./../middlewares/jwtAuth');
 const jwt = require('jsonwebtoken');
 let router = express.Router();
 const User = require('./../helpers/users');
+const Chat = require('./../helpers/conversation');
 const multer = require('./../helpers/multer');
 const config = require('./../helpers/config');
 
@@ -123,6 +124,8 @@ router.post('/searchAll', auth, async (req, res) => {
                     phoneNumber: newNumber};
                resultFind = resp.data.find(el => {return el.users_phone === newUser.phoneNumber});
             if(resultFind){
+                let chat = await Chat.interpolateChats(req.user.users_id, resultFind.users_id);
+                if(chat.res) newUser.chatId = chat.chatId;
                 newUser.id = resultFind.users_id;
                 newUser.picture_url = resultFind.user_picture_url;
                 userList.users.push(newUser);
