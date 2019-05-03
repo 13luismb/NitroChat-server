@@ -24,7 +24,7 @@ module.exports.newConversation = async (req, type, converName, users) => {
         return ({
             status: 200,
             message:'ok',
-            conversation_id: conversation.conversations_id,
+            conversations_id: conversation.conversations_id,
             conversation: conversation,
             participants: totalUsers,
             message: message.message

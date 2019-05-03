@@ -41,7 +41,8 @@ const io = require('./../helpers/socketconfig');
 
     router.post('/newChat', auth, async (req,res)=>{
         try{
-            const resp = await Chat.newConversation(req, req.body.type, req.body.converName, req.body.users);
+            console.log(req.body);
+            const resp = await Chat.newConversation(req, req.body.typeConversation, req.body.converName, req.body.users);
             if(req.body.attachment) {
             	const file = upload.storeFile(req.body.attachment,resp.conversation.conversations_id);
             	const x = await Chat.updateGroupPic(file, resp.conversation.conversations_id);
@@ -59,6 +60,7 @@ const io = require('./../helpers/socketconfig');
             for (let a of users){
                 io.sockets.in(`user ${a}`).emit('dash-msg', message);
             }
+            console.log('lo lograste');
             res.status(resp.status).send(resp);
         }catch(e){
             console.log(e);
