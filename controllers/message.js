@@ -57,7 +57,8 @@ io.sockets.on('connection', socket =>{
 	});
     socket.on('fwd-msg', async data => {
         const user = `user`;
-        const room = `chat`
+        const room = `chat`;
+        console.log(data)
         for (let a of data.targets){
             let resp;
             if (data.attachment === null){
