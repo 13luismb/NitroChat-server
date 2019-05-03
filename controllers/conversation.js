@@ -2,6 +2,7 @@ const express = require('express');
 const auth = require('./../middlewares/jwtAuth');
 let router = express.Router();
 const Chat = require('./../helpers/conversation');
+const upload = require('./../helpers/upload');
 const multer = require('./../helpers/multer');
 const io = require('./../helpers/socketconfig');
 
@@ -41,6 +42,11 @@ const io = require('./../helpers/socketconfig');
     router.post('/newChat', auth, async (req,res)=>{
         try{
             const resp = await Chat.newConversation(req, req.body.type, req.body.converName, req.body.users);
+            if(req.body.attachment) {
+            	const file = upload.storeFile(req.body.attachment,resp.conversation.conversations_id);
+            	const x = await Chat.updateGroupPic(file, resp.conversation.conversations_id);
+            	resp.conversation.conversation_picture_url = file;
+            }
             const message = {...resp.conversation, last_message: resp.message, participants: resp.participants};
             let users = message.participants.map(el => {
                 if (el.users_id === req.user.users_id){
