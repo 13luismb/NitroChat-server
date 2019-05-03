@@ -86,9 +86,10 @@ io.sockets.on('connection', socket =>{
     });
 
     socket.on('add-group-member', async data => {
-        const resp = await Chat.addNewMemberToGroup(data.chatId, data.targetId, data.userId)
-        io.sockets.in(`chat ${data.chatId}`).emit('new-member', resp);
-
+        for (let a of data.targets){
+            const resp = await Chat.addNewMemberToGroup(data.chatId, a, data.userId)
+            io.sockets.in(`chat ${data.chatId}`).emit('new-member', resp);
+        }
     });
 
     socket.on('delete-group-member', async data => {

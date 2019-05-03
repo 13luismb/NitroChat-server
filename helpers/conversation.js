@@ -206,6 +206,7 @@ module.exports.eraseGroup = async (chatId) => {
 module.exports.updateGroupPic = async (file, chatId) => {
     try{
         await db.none(sql.updateGroupPicture, [file, chatId]);
+        console.log({value:'quepaso'});
         return ({status:200, msg:'updated', picture:file});
     }catch(e){
         console.log(e);
