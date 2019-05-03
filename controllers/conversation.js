@@ -2,7 +2,7 @@ const express = require('express');
 const auth = require('./../middlewares/jwtAuth');
 let router = express.Router();
 const Chat = require('./../helpers/conversation');
-const upload = require('./../helpers/upload');
+const upload = require('./../helpers/uploads');
 const multer = require('./../helpers/multer');
 const io = require('./../helpers/socketconfig');
 

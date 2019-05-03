@@ -4,6 +4,7 @@ const auth = require('./../middlewares/jwtAuth');
 const http = require('./../index');
 const upload = require('./../helpers/uploads');
 const Message = require('./../helpers/message');
+const Chat = require('./../helpers/conversation');
 const db = require('./../helpers/db');
 const sql = require('./../helpers/queries.js');
 const io = require('./../helpers/socketconfig');
@@ -21,9 +22,7 @@ io.sockets.on('connection', socket =>{
 		socket.join(data.room);
 	})
 	socket.on('open-chat', data => {
-		// socket.room = data.room;
 		socket.join(data.room);
-		console.log(Object.keys(socket.rooms));
 	})
     socket.on('leave-chat', data => {
         socket.leave(data.room);
@@ -48,29 +47,6 @@ io.sockets.on('connection', socket =>{
         }
 	});
 
-    socket.on('fwd-msg', async data => {
-        const user = `user`;
-        for (let a of data.targets){
-            let resp;
-            if (data.attachment === null){
-              resp  = await Message.createMessage(data.id, a.chatId, null, data.message);
-            }else{
-                //const file = await upload.copyImage(data.attachment, a.chatId, data.oldChatId);
-                resp  = await Message.createMessage(data.id, a.chatId, data.attachment, data.message);
-            }
-            let chat = await db.one(sql.getSingleChat, [a.chatId]);
-            chat.participants = await db.any(sql.getConversationParticipants, [a.chatId]);
-            chat.last_message = resp.message;
-            await db.none(sql.undeleteConversation, [a.chatId]);
-            console.log(a.room);
-            io.sockets.in(a.room).emit('get-msg', resp.message);
-            for (let b of a.user){
-                 io.sockets.in(user, b).emit('dash-msg', chat);
-            }
-        }
-    });
-
-	/*		NEEDS TO BE FINISHED		*/
 	socket.on('update-msg', async data => {
         const resp = await Message.updateMessage(data.messageId, data.message);
 		io.sockets.in(data.room).emit('receive-update', resp);
@@ -79,29 +55,54 @@ io.sockets.on('connection', socket =>{
         const resp = await Message.deleteMessage(data.chatId, data.messageId);
 		io.sockets.in(data.room).emit('message-was-deleted', data);
 	});
-})
+    socket.on('fwd-msg', async data => {
+        const user = `user`;
+        for (let a of data.targets){
+            let resp;
+            if (data.attachment === null){
+              resp  = await Message.createMessage(data.id, a.chatId, null, data.message);
+            }else{
+                resp  = await Message.createMessage(data.id, a.chatId, data.attachment, data.message);
+            }
+            let chat = await db.one(sql.getSingleChat, [a.chatId]);
+            chat.participants = await db.any(sql.getConversationParticipants, [a.chatId]);
+            chat.last_message = resp.message;
+            await db.none(sql.undeleteConversation, [a.chatId]);
+            io.sockets.in(a.room).emit('get-msg', resp.message);
+            for (let b of a.user){
+                 io.sockets.in(user, b).emit('dash-msg', chat);
+            }
+        }
+    });
 
 
-    /*           DETAILS PAGE SOCKET LOGIC          */
+        /*           DETAILS PAGE SOCKET LOGIC          */
 
     socket.on('give-admin', async data => {
-
+        const resp = await Chat.createNewAdmin(data.chatId, data.targetId, data.userId)
+        io.sockets.in(`chat ${data.chatId}`).emit('new-admin', resp);
     });
 
     socket.on('add-group-member', async data => {
+        const resp = await Chat.addNewMemberToGroup(data.chatId, data.targetId, data.userId)
+        io.sockets.in(`chat ${data.chatId}`).emit('new-member', resp);
 
     });
 
     socket.on('delete-group-member', async data => {
+        const resp = await Chat.deleteMemberFromGroup(data.chatId, data.targetId, data.userId)
+        io.sockets.in(`chat ${data.chatId}`).emit('member-deleted', resp);
 
     });
 
     socket.on('change-group-name', async data => {
-
+        const resp = await Chat.changeGroupName(data.newName, data.chatId, data.userId)
+        io.sockets.in(`chat ${data.chatId}`).emit('name-changed', resp);
     });
 
 
-    /*      SOCKET LOGIC ENDS HERE          */
+    /*      ALL SOCKET LOGIC ENDS HERE          */
+});
 
 
     router.get('/chats/:chatId/messages', auth, async (req,res)=>{

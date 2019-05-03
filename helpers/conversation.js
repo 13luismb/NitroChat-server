@@ -176,40 +176,51 @@ module.exports.eraseGroup = async (chatId) => {
 module.exports.updateGroupPic = async (file, chatId) => {
     try{
         await db.none(sql.updateGroupPicture, [file, chatId]);
-        return ({status:200, msg:'updated'});
+        return ({status:200, msg:'updated', picture:file});
     }catch(e){
         return ({status:500, error:e})
     }
 }
 //MUST BE FINISHED
-module.exports.createNewAdmin = async (chatId, userId) => {
+module.exports.createNewAdmin = async (chatId, userId, adminId) => {
     try{
         await db.none(sql.newAdminInGroup, [chatId, userId]);
+        const admin = await db.one(sql.getSimpleInfo, [userId]);
+        const message  = await Message.createMessage(adminId, chatId, null, `${admin.users_username} is now an admin`);
+        return ({status:200, chat: chatId, user: userId, message: message.message});
     }catch(e){
         return ({status:500, error:e});
     }
 }
 
 //THIS ONE IS PRETTY IMPORTANT
-module.exports.addNewMemberToGroup = async (chatId, userId) => {
+module.exports.addNewMemberToGroup = async (chatId, userId, adminId) => {
     try{
         await db.none(sql.createUsersConversation, [chatId, 1, userId]);
+        const newUser = await db.one(sql.getSimpleInfo, [userId]);
+        const message  = await Message.createMessage(adminId, chatId, null, `${newUser.users_username} has entered the group`);
+        return ({status:200, message: message.message});
     }catch(e){
         return ({status:500, error:e});
     }
 }
 
-module.exports.deleteMemberFromGroup = async (chatId, userId) => {
+module.exports.deleteMemberFromGroup = async (chatId, userId, adminId) => {
     try{
         await db.none(sql.getOutOfGroup, [chatId, userId]);
+        const kickUser = await db.one(sql.getSimpleInfo, [userId]);
+        const message  = await Message.createMessage(adminId, chatId, null, `${kickUser.users_username} has been kicked out`);
+        return ({status:200, message: message.message});
     }catch(e){
         return ({status:500, error:e});
     }
 }
 
-module.exports.changeGroupName = async (name, chatId) => {
+module.exports.changeGroupName = async (name, chatId, adminId) => {
     try{
         await db.none(sql.updateGroupName, [name, chatId]);
+        const message  = await Message.createMessage(adminId, chatId, null, `group name has been changed to ${name}`);
+        return ({status:200, message: message.message, name});
     }catch(e){
         return ({status:500, error:e});
     }
